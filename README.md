@@ -26,7 +26,7 @@ plugin install givensuman/zsh-allclear
 Grab the plugin:
 
 ```zsh
-git clone https://github.com/givensuman/zsh-plugin-manager ${ZPLUGINDIR:-$HOME/.config/zsh/plugins/zsh-plugin-manager}
+git clone https://github.com/givensuman/zsh-plugin-manager ${ZPLUGINDIR:-$HOME/.config/zsh/plugins}/zsh-plugin-manager
 ```
 
 And add this to your `~/.zshrc`:
