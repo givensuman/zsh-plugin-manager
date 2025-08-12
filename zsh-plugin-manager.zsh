@@ -31,10 +31,13 @@ function _plugin-update {
   done
 }
 
-
 ##? List all installed plugins
 function _plugin-list {
-  ls $ZPLUGINDIR
+  if [[ -n $1 ]]; then
+    ls $ZPLUGINDIR | grep -E "$1"
+  else
+    ls $ZPLUGINDIR
+  fi
 }
 
 ##? Remove each plugin
