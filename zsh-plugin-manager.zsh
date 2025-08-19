@@ -8,7 +8,7 @@ local fns_dir="${ZPLUGINDIR}/zsh-plugin-manager/functions"
 local fns=(
   # "install"
   "update"
-  # "remove"
+  "remove"
   "list"
   "help"
   "source"

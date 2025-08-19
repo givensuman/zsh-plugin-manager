@@ -2,6 +2,12 @@
 
 ##? List installed plugins
 function plugin-list {
+  # TODO: Improve usage message
+  if [[ $1 =~ "--help" || $1 =~ "-h" ]]; then
+    echo "Usage: plugin list [regex]"
+    return 0
+  fi
+
   local plugins=()
 
   for plugin in $(ls $ZPLUGINDIR); do
@@ -25,7 +31,7 @@ function plugin-list {
     for plugin in $plugins; do
       echo $plugin
     done
-  else
+  else # Filter with regex
     for plugin in $plugins; do
       echo $plugin
     done | grep -E $1
