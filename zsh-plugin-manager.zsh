@@ -6,7 +6,7 @@ local ZPLUGINDIR=${ZPLUGINDIR:-${ZDOTDIR:-$HOME/.config/zsh}/plugins}
 
 local fns_dir="${ZPLUGINDIR}/zsh-plugin-manager/functions"
 local fns=(
-  # "install"
+  "install"
   "update"
   "remove"
   "list"
@@ -39,6 +39,6 @@ function plugin {
     remove)  shift; plugin-remove  $@ ;;
     list)    shift; plugin-list    $@ ;;
     "source")shift; plugin-source  $@ ;;
-    *) { plugin-help; return 1; }     ;;
+    *) { plugin-help; return 1; }
   esac
 }
