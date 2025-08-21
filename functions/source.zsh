@@ -17,10 +17,8 @@ function plugin-source {
     fi
 
     pushd $plugin_location > /dev/null # Change working directory
-    echo $plugin_location
 
-    local sourceable_files=$(ls $plugin_location | grep ".zsh$")
-    echo $sourceable_files
+    local sourceable_files=$(ls $plugin_location | grep -E "\.zsh(-theme)?$")
     for file in $sourceable_files; do
       source $file
     done
