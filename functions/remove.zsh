@@ -1,5 +1,8 @@
 #!/bin/zsh
 
+# ISSUE: Removing a plugin with --path does not work
+
+##? Remove plugins
 function plugin-remove {
   # TODO: Improve usage message
   if [[ $# == 0 || $1 =~ "--help" || $1 =~ "-h" ]]; then

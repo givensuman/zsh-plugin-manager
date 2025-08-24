@@ -1,100 +1,42 @@
 #!/bin/zsh
 
+##? Install plugins through `git`
 function plugin-install {
-  # Define git binary path, necessary due to
-  # PATH issues with nested functions
-  git_bin=$(which git)
-
   # TODO: Improve usage message
   if [[ $# == 0 || $1 =~ "--help" || $1 =~ "-h" ]]; then
     echo "Usage: plugin install [name...]"
     return 0
   fi
 
-  function install-plugin-by-arg {
-    # Taken in as arguments
-    local plugin_arg=$1
-    local path=$2
-    local branch=$3
-    # Necessary for PATH issues with 
-    # nested functions
+  # For reasons I haven't figured out, ZSH loses
+  # PATH access halfway through executing this function
+  # TODO: It's freakin' Silverblue...
+  local GIT_BIN=$(which git)
+  local RM_BIN=$(which rm)
 
-    # Fill in variables
+  ##? Parse out the repository name and git URL
+  # @arg    $1 The plugin argument
+  #
+  # @return $1 The repository name
+  # @return $2 The git URL
+  function parse-plugin-information {
     local git_url=""
     local repo_name=""
 
-    # If the `plugin_arg` is a URL
-    if [[ $plugin_arg =~ ^https?:// || $plugin_arg =~ ^git@ ]]; then
-      # Use string manipulation to get the repo name without basename
-      # This removes everything up to the last slash and the .git suffix
-      local repo_name="${${plugin_arg##*/}%.git}"
-      local git_url="$plugin_arg"
-    # If the `plugin_arg` is a GitHub repo in the form of `user/repo`
-    elif [[ $plugin_arg =~ ^[^/]+/[^/]+$ ]]; then
-      # Parse repo name out
-      local repo_name="${${plugin_arg##*/}%.git}"
-      local git_url="https://github.com/$plugin_arg.git"
+    # If the argument is a URL
+    if [[ $1 =~ ^https?:// || $1 =~ ^git@ ]]; then
+      # Remove everything up to the last slash and the .git suffix
+      local repo_name="${${1##*/}%.git}"
+      local git_url="$1"
+    # If the argument is a GitHub repo in the form of `user/repo`
+    elif [[ $1 =~ ^[^/]+/[^/]+$ ]]; then
+      local repo_name="${${1##*/}%.git}"
+      local git_url="https://github.com/$1.git"
     else
-      echo "${fg[yellow]}Invalid plugin name \"$plugin_arg\"${reset_color}"
+      echo "${fg[yellow]}Invalid plugin name \"$1\"${reset_color}"
     fi
 
-    echo "repo_name: $repo_name"
-    echo "git_url: $git_url"
-    echo ""
-    echo "plugin_arg: $plugin_arg"
-    echo "path: $path"
-    echo "branch: $branch"
-
-
-    # Handle cases where directory exists
-    if [[ -d "$ZPLUGINDIR/$repo_name" ]]; then
-      pushd "$ZPLUGINDIR/$repo_name" > /dev/null
-
-      if [[ $path != "" ]]; then
-        if [[ "$(git config --get core.sparseCheckout)" == "true" ]]; then
-          ($git_bin sparse-checkout add "$path") > /dev/null
-
-          popd > /dev/null
-          # TODO: Error message
-          return $?
-        else
-          echo "${fg[yellow]}Plugin parent \"$repo_name\" exists and is is not a sparse-checkout${reset_color}"
-
-          popd > /dev/null
-          return 1
-        fi
-      else # May be sparse-checkout
-        if [[ "$(git config --get core.sparseCheckout)" == "true" ]]; then
-          ($git_bin sparse-checkout disable) > /dev/null
-
-          popd > /dev/null
-          # TODO: Error message
-          return $?
-        else # Not a sparse-checkout, directory exists, path not specified
-          echo "${fg[yellow]}Plugin \"$repo_name\" already installed${reset_color}"
-
-          popd > /dev/null
-          return 1
-        fi
-      fi
-    fi
-
-    # Install the plugin
-    if [[ $branch != "" ]]; then
-      ($git_bin clone -b "$branch" "$git_url" "$ZPLUGINDIR/$repo_name") > /dev/null
-      # TODO: Error message
-    else
-      ($git_bin clone "$git_url" "$ZPLUGINDIR/$repo_name") > /dev/null
-      # TODO: Error message
-    fi
-
-    if [[ $path != "" ]]; then
-      pushd "$ZPLUGINDIR/$repo_name" > /dev/null
-
-      git sparse-checkout init --cone > /dev/null
-      git sparse-checkout add "$path" > /dev/null
-      # TODO: Error message
-    fi
+    echo "$repo_name $git_url"
   }
 
   local path=""
@@ -133,14 +75,47 @@ function plugin-install {
     if [[ "$path" != "" || "$branch" != "" ]]; then
       echo "${fg[yellow]}Cannot specify path and branch for multiple plugins${reset_color}"
     else
-      for plugin in "$positional_args[@]"; do
-        install-plugin-by-arg "$plugin" "" ""
+      for plugin in "${positional_args[@]}"; do # Install multiple plugins
+        plugin_information=(${(s: :)$(parse-plugin-information "$plugin")} )
+
+        local repo_name="${plugin_information[1]}"
+        local git_url="${plugin_information[2]}"
+
+        $GIT_BIN clone "$git_url" "$ZPLUGINDIR/$repo_name"
       done
     fi
-  else
-    # Install a single plugin
-    install-plugin-by-arg "${positional_args[1]}" "$path" "$branch"
+  else # Install a single plugin
+    plugin_information=(${(s: :)$(parse-plugin-information "${positional_args[1]}")} )
+
+    local repo_name="${plugin_information[1]}"
+    local git_url="${plugin_information[2]}"
+
+    if [[ ! "$branch" == "" ]]; then
+      $GIT_BIN clone -b "$branch" "$git_url" "$ZPLUGINDIR/$repo_name"
+    else
+      $GIT_BIN clone "$git_url" "$ZPLUGINDIR/$repo_name"
+    fi
+
+    if [[ ! "$path" == "" ]]; then
+      pushd "$ZPLUGINDIR/$repo_name" > /dev/null
+
+      if [[ ! -d "$path" ]]; then
+        echo "${fg[yellow]}Path \"$path\" is not a directory${reset_color}"
+        popd > /dev/null
+        $RM_BIN -rf "$ZPLUGINDIR/$repo_name"
+
+        return 1
+      fi
+
+      if [[ ! "$(git config --get core.sparseCheckout)" == "true" ]]; then
+        $GIT_BIN sparse-checkout init --cone
+      fi
+
+      $GIT_BIN sparse-checkout add "$path"
+
+      popd > /dev/null
+    fi
   fi
 
-  unset -f install-plugin-by-arg
+  unset -f parse-plugin-information
 }

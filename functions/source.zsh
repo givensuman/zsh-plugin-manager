@@ -8,6 +8,8 @@ function plugin-source {
     return 0
   fi
 
+  typeset -TUg +x FPATH=$ZPLUGINDIR:$FPATH fpath
+
   function source-plugin-by-name {
     local plugin_location="$ZPLUGINDIR/$1"
 

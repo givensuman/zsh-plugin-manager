@@ -34,11 +34,11 @@ function plugin {
   fi
 
   case $1 in
-    install) shift; plugin-install $@ ;;
-    update)  shift; plugin-update  $@ ;;
-    remove)  shift; plugin-remove  $@ ;;
-    list)    shift; plugin-list    $@ ;;
-    "source")shift; plugin-source  $@ ;;
+    install)  shift; plugin-install $@ ;;
+    update)   shift; plugin-update  $@ ;;
+    remove)   shift; plugin-remove  $@ ;;
+    list)     shift; plugin-list    $@ ;;
+    "source") shift; plugin-source  $@ ;;
     *) { plugin-help; return 1; }
   esac
 }
