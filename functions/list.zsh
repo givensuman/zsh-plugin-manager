@@ -3,15 +3,17 @@
 ##? List installed plugins
 function plugin-list {
   # TODO: Improve usage message
-  if [[ $1 =~ "--help" || $1 =~ "-h" ]]; then
-    echo "Usage: plugin list [regex]"
-    return 0
-  fi
+   if [[ $1 =~ "--help" || $1 =~ "-h" ]]; then
+     echo "Usage: plugin list [regex]"
+     echo ""
+     echo "Arguments:"
+     echo "  regex    Optional regex to filter plugin names"
+     return 0
+   fi
 
   local plugins=()
 
-  for plugin in $(ls $ZPLUGINDIR); do
-    if [[ -d "$ZPLUGINDIR/$plugin" ]]; then
+   for plugin in $ZPLUGINDIR/*(/:t); do
       pushd "$ZPLUGINDIR/$plugin" > /dev/null # Change working directory
 
       # Determine if the plugin is a sparse-checkout

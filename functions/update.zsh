@@ -10,10 +10,11 @@ function plugin-update {
       return 1
     fi
 
-    # TODO: Some kind of feedback for updating process
-    pushd $plugin_location > /dev/null # Change working directory
-    git pull > /dev/null
-    popd > /dev/null # Change working directory back
+     pushd $plugin_location > /dev/null # Change working directory
+     if ! git pull > /dev/null; then
+       echo "${fg[red]}Failed to update $1${reset_color}"
+     fi
+     popd > /dev/null # Change working directory back
   }
 
   if [[ $# == 0 ]]; then
