@@ -2,7 +2,6 @@
 
 ##? Install plugins through `git`
 function plugin-install {
-  # TODO: Improve usage message
    if [[ $# == 0 || $1 =~ "--help" || $1 =~ "-h" ]]; then
      echo "Usage: plugin install [--path PATH] [--branch BRANCH] <name...>"
      echo ""
@@ -15,9 +14,6 @@ function plugin-install {
      return 0
    fi
 
-  # For reasons I haven't figured out, ZSH loses
-  # PATH access halfway through executing this function
-  # TODO: It's freakin' Silverblue...
   local GIT_BIN=$(which git)
   local RM_BIN=$(which rm)
 

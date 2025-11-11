@@ -2,7 +2,6 @@
 
 ##? Source plugins
 function plugin-source {
-  # TODO: Improve usage message
    if [[ $1 =~ "--help" || $1 =~ "-h" ]]; then
      echo "Usage: plugin source [name...|repo/subpath]"
      echo ""

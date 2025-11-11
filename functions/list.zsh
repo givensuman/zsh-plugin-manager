@@ -2,7 +2,6 @@
 
 ##? List installed plugins
 function plugin-list {
-  # TODO: Improve usage message
    if [[ $1 =~ "--help" || $1 =~ "-h" ]]; then
      echo "Usage: plugin list [regex]"
      echo ""
@@ -26,7 +25,6 @@ function plugin-list {
       fi
 
       popd > /dev/null # Change working directory back
-    fi
   done
 
   if [[ $# == 0 ]]; then

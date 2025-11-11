@@ -4,7 +4,6 @@
 
 ##? Remove plugins
 function plugin-remove {
-  # TODO: Improve usage message
    if [[ $# == 0 || $1 =~ "--help" || $1 =~ "-h" ]]; then
      echo "Usage: plugin remove [name...|repo/subpath]"
      echo ""
