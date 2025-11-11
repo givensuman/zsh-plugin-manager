@@ -36,20 +36,6 @@ source "${ZPLUGINDIR:-${ZDOTDIR:-$HOME/.config/zsh}/plugins}/zsh-plugin-manager/
 plugin source
 ```
 
-
-```zsh
-wget -qO- https://raw.githubusercontent.com/givensuman/zsh-plugin-manager/main/zsh-plugin-manager.zsh >> ~/.zshrc
-```
-
-## Testing
-
-Run the test suite to verify functionality:
-
-```zsh
-cd tests
-zsh run_tests.zsh
-```
-
 ## Acknowledgements
 
 The API is directly meant to emulate [fisher](https://github.com/jorgebucaran/fisher).
